@@ -1,0 +1,14 @@
+package StakeholderRequirements
+import AbstractRequirements
+
+// Stakeholder requirement: A need of the tool user, described from the user perspective.
+// It is the base for the software requirements and is verified by the tool qualification tests.
+type StkReq extends AbstractRequirements.Requirement {
+    rationale               String
+    acceptance_criteria     String
+}
+
+// Stakeholder constraint: A boundary condition given by the stakeholder, e.g. technology or process.
+type StkConstraint extends AbstractRequirements.Requirement {
+    rationale   optional    String
+}

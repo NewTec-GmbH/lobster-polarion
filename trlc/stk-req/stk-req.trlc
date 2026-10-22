@@ -1,0 +1,229 @@
+package StakeholderRequirements
+import AbstractRequirements
+import Generic
+
+section "Stakeholder Requirements" {
+
+    Generic.Info stk_req_info_about {
+        description =
+            """
+            This file contains the stakeholder requirements for the lobster-polarion tool. They describe the needs of the
+            tool user and the given boundary conditions. The software requirements are derived from them.
+
+            Note: This file is only the working draft for the initial import into Polarion, see
+            stk_constraint_managed_in_polarion. After the import Polarion is the master and this file is removed.
+
+            Background: LOBSTER (https://github.com/bmw-software-engineering/lobster) creates traceability reports, but
+            has no support for Polarion. For the requirements management tool Codebeamer this gap is closed by the tool
+            lobster-codebeamer. lobster-polarion shall close the same gap for Polarion.
+            """
+    }
+
+    section "General" {
+
+        StkReq stk_req_polarion_to_lobster {
+            description = "The tool shall convert Polarion work items into the LOBSTER common interchange format, so that they can be used as items in a LOBSTER tracing report."
+            rationale = "Requirements and other artefacts are managed in Polarion, but LOBSTER can not read them directly."
+            acceptance_criteria = "A LOBSTER tracing report is created, which contains the work items of a Polarion project and their traces to e.g. source code."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+
+        StkReq stk_req_cli {
+            description = "The tool shall be a non-interactive command line tool. All inputs shall be given by the configuration file, command line arguments and environment variables; the tool shall never prompt the user for input."
+            rationale = "LOBSTER is a set of command line tools, which are typically used in build pipelines, where no user interaction is possible."
+            acceptance_criteria = "The tool runs in a build pipeline without any user interaction and signals success or failure by its exit code. In no case the tool waits for user input."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+
+        StkReq stk_req_offline {
+            description = "The tool shall be usable without a connection to the Polarion server (offline), e.g. by converting a previously exported Polarion file."
+            rationale = "The tracing report may have to be created in environments without access to the Polarion server, e.g. in an isolated build pipeline."
+            acceptance_criteria = "A LOBSTER tracing report is created from Polarion work items without network access to the Polarion server."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+            note = "Open issue: Is an offline usage needed at all? If yes, which input (e.g. Polarion export format XML/JSON/ReqIF) shall be supported?"
+        }
+
+        StkReq stk_req_version {
+            description = "The tool shall show its version on request."
+            rationale = "Required by the NewTec code review checklist for command line tools. The version is also needed to identify the tool in a tool qualification."
+            acceptance_criteria = "The shown version is equal to the released version of the tool."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+    }
+
+    section "Selection of Work Items" {
+
+        StkReq stk_req_select_query {
+            description = "The user shall be able to select the work items to export by a Polarion query."
+            rationale = "The query defines the complete set of work items, e.g. all approved requirements of a project. This allows lobster-report to check that all of them are traced. Equivalent to 'import_query' of lobster-codebeamer."
+            acceptance_criteria = "Exactly the work items matching the query are exported."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+
+        StkReq stk_req_select_tagged {
+            description = "The user shall be able to export only the work items which are referenced by an existing LOBSTER file."
+            rationale = "Equivalent to 'import_tagged' of lobster-codebeamer. Useful if the referenced work items are scattered over Polarion. No completeness check is possible in this case."
+            acceptance_criteria = "Exactly the work items referenced by the given LOBSTER file are exported."
+            valid_status = AbstractRequirements.VALID_STATUS.rejected
+            note = "Rejected by the stakeholder on 2026-09-24: Not needed. The work items are selected by query or document only. Scattered work items can be selected by a suitable query (filter), see stk_req_select_query."
+        }
+
+        StkReq stk_req_select_document {
+            description = "The user shall be able to export all work items of a Polarion document (LiveDoc)."
+            rationale = "In Polarion requirements are typically organized in documents, e.g. one document per specification."
+            acceptance_criteria = "Exactly the work items contained in the given document are exported."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+
+        StkReq stk_req_baseline {
+            description = "The user shall be able to export the work items in the state of a defined Polarion baseline or revision."
+            rationale = "The tracing report of a release must be reproducible and must refer to a defined state of the requirements. Equivalent to 'baseline_id' of lobster-codebeamer."
+            acceptance_criteria = "Exporting the same baseline twice results in identical output, even if the work items were changed in between."
+            valid_status = AbstractRequirements.VALID_STATUS.rejected
+            note = "Rejected by the stakeholder on 2026-09-24: Not needed. Always the current state (HEAD) of the work items is exported. Known risk: Without a baseline a tracing report of a release is not reproducible, which is in tension with stk_constraint_tool_qualification. The user has to archive the generated output file of a release instead."
+        }
+    }
+
+    section "Content of the LOBSTER Items" {
+
+        StkReq stk_req_item_content {
+            description = "Each exported LOBSTER item shall contain the id, title, type, status and description of the work item. The description shall be converted from Polarion rich text (HTML) into plain text. The user shall be able to configure further work item fields (incl. custom fields), which are added to the item text."
+            rationale = "The tracing report shall be understandable without opening Polarion. Which further fields are relevant depends on the Polarion project configuration. lobster-codebeamer provides 'item_to_text' for the same purpose."
+            acceptance_criteria = "The tracing report shows id, title, type, status and description of each work item and the values of the configured further fields. The description contains no HTML markup."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+            note = "Open issue: Which work item attributes are mandatory, and is a configuration of further fields needed at all? To be clarified with Andi Schönman."
+        }
+
+        StkReq stk_req_item_schema {
+            description = "The user shall be able to choose per export, whether the selected work items are mapped to LOBSTER requirements, implementations or activities. The Polarion work item type (e.g. 'requirement', 'testcase') shall be taken over as the kind of the LOBSTER item."
+            rationale = "Polarion does not only contain requirements, but e.g. also test cases, which are activities in LOBSTER. A LOBSTER file contains items of exactly one schema, so the mapping is defined per export. Equivalent to 'schema' of lobster-codebeamer."
+            acceptance_criteria = "The output file uses the chosen LOBSTER schema (lobster-req-trace, lobster-imp-trace or lobster-act-trace) and each item shows the Polarion work item type as its kind."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+            note = "Open issue: Is one schema per export sufficient, or is a mapping table 'Polarion work item type -> LOBSTER schema' needed, which splits one selection into several output files?"
+        }
+
+        StkReq stk_req_item_references {
+            description = "The user shall be able to take over links between work items as LOBSTER references, selectable by the link role."
+            rationale = "Tracing between work items is managed in Polarion by links, e.g. a software requirement 'refines' a system requirement. LOBSTER shall be able to report these traces. Equivalent to 'refs' of lobster-codebeamer."
+            acceptance_criteria = "Links with the selected roles are shown as traces in the tracing report, links with other roles are not."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+            note = "Open issue: Part of the first release or deferred to a future version?"
+        }
+
+        StkReq stk_req_navigation {
+            description = "The user shall be able to navigate from an item in the tracing report to the work item in Polarion."
+            rationale = "Reviewing the traces requires access to the complete work item."
+            acceptance_criteria = "Each work item in the HTML tracing report contains a working link to the work item in Polarion. Until a Polarion location kind is available in LOBSTER, the Polarion work item id is shown as plain text instead."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+            note = "LOBSTER 1.0.6 only supports the location kinds 'file', 'github', 'codebeamer' and 'void'. Decision of the stakeholder on 2026-09-24: A Polarion location kind shall be contributed to BMW LOBSTER. The fulfillment of this requirement depends on the acceptance of the contribution by BMW."
+        }
+    }
+
+    section "Configuration and Access" {
+
+        StkReq stk_req_config_file {
+            description = "The tool shall be configurable by a configuration file, which can be put under version control."
+            rationale = "The export must be repeatable with identical settings. lobster-codebeamer uses a YAML configuration file for the same reason."
+            acceptance_criteria = "All settings except the credentials can be given in the configuration file."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+
+        StkReq stk_req_authentication {
+            description = "The tool shall authenticate at Polarion either with user and password or with user and personal access token. If a token is given, it shall be used instead of the password. The password and the token shall not be given as command line arguments or in the configuration file, but via environment variables."
+            rationale = "Command line arguments are visible in the process list and the shell history of the host, and the configuration file is under version control. Environment variables can be filled directly from the secrets of a build pipeline. The login concept (user with password or token) is the same as in pyPolarionCli, see stk_constraint_pypolarioncli."
+            acceptance_criteria = "The tool accesses Polarion with user and password as well as with user and token, given via environment variables. The tool provides no command line argument and no configuration file setting for the password or the token."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+
+        StkReq stk_req_credential_protection {
+            description = "The tool shall never output the password or the token in plain text, neither on the console nor in log or output files, also not in verbose mode or in error messages."
+            rationale = "Console output and logs of build pipelines are accessible to many persons and are archived. pyPolarionCli prints all program arguments incl. the password in verbose mode, which shall be avoided."
+            acceptance_criteria = "In none of the tool outputs (console, output file), in any mode and error case, the given password or token appears in plain text."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+
+        StkReq stk_req_network {
+            description = "The tool shall access Polarion via HTTPS with certificate verification and shall support company networks with own certificate authorities and proxies."
+            rationale = "Polarion servers are typically operated in company networks."
+            acceptance_criteria = "The tool accesses a Polarion server, whose certificate is issued by a company certificate authority, via a proxy."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+
+        StkReq stk_req_robustness {
+            description = "The tool shall retry requests to Polarion which failed due to a temporary error. Temporary errors are a connection abort, a timeout and a server error with a configurable HTTP status code (e.g. 502, 503, 504). The number of retries shall be configurable."
+            rationale = "Temporary server errors shall not break the build pipeline. lobster-codebeamer provides a configurable retry for the same reason."
+            acceptance_criteria = "A request which fails with a temporary error is repeated up to the configured number of retries. The export succeeds if a repetition succeeds and fails if all repetitions fail."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+    }
+
+    section "Reliability of the Result" {
+
+        StkReq stk_req_completeness {
+            description = "The tool shall export all work items of the selection, independent of their number or fail with an error."
+            rationale = "Missing work items would be missing in the tracing report and could hide untraced requirements."
+            acceptance_criteria = "The number of exported work items is equal to the number of work items of the selection in Polarion, also for selections which require more than one request to Polarion."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+
+        StkReq stk_req_error_handling {
+            description = "The tool shall report any failure with a comprehensible message and a failure exit code. In this case no output file shall exist afterwards, i.e. no new output file is created and an output file of a previous run is removed."
+            rationale = "An incomplete output file, or an outdated one of a previous run, would lead to a wrong tracing report without being noticed, e.g. if the exit code is not evaluated."
+            acceptance_criteria = "For each failure (e.g. server not reachable, authentication failed, invalid configuration) a message and a failure exit code are shown and no output file exists, also if an output file of a previous successful run existed before."
+            note = "Hint for the design: Write the output into a temporary file and rename it only on success, so that a partially written file never exists under the output file name."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+
+        StkReq stk_req_empty_selection {
+            description = "The tool shall report a failure if the selection does not contain any work item."
+            rationale = "An empty selection is most likely caused by a wrong configuration, e.g. a typo in the query, and would result in an apparently complete tracing report."
+            acceptance_criteria = "An empty selection leads to a message and a failure exit code."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+    }
+
+    section "Constraints" {
+
+        StkConstraint stk_constraint_python {
+            description = "The tool shall be implemented in Python and shall support Python 3.10 and newer."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+
+        StkConstraint stk_constraint_os {
+            description = "The tool shall run on Windows and Linux."
+            rationale = "Same as lobster-doxygen; build pipelines typically run on Linux, developers work on Windows."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+
+        StkConstraint stk_constraint_coding_guideline {
+            description = "The source code shall follow the NewTec Coding Guidelines for Python (PEP8, pylint, maximum line length 120)."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+
+        StkConstraint stk_constraint_like_lobster_doxygen {
+            description = "The repository structure, Python code and development tooling shall be similar to lobster-doxygen (https://github.com/NewTec-GmbH/lobster-doxygen)."
+            rationale = "Uniform tools within the NewTec LOBSTER extensions ease the maintenance."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+            note = "Deviation: The requirements, architecture and tests are managed in Polarion instead of TRLC, see stk_constraint_managed_in_polarion."
+        }
+
+        StkConstraint stk_constraint_like_lobster_codebeamer {
+            description = "The concept of the tool (configuration, selection of items, mapping to LOBSTER items) shall be similar to lobster-codebeamer (https://github.com/bmw-software-engineering/lobster/tree/main/packages/lobster-tool-codebeamer)."
+            rationale = "Users familiar with LOBSTER shall find a known concept."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+
+        StkConstraint stk_constraint_pypolarioncli {
+            description = "The tool shall access Polarion by using pyPolarionCli (https://github.com/NewTec-GmbH/pyPolarionCli) as a Python library."
+            rationale = "Reuse of the existing NewTec Polarion access instead of a second implementation eases the maintenance."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+            note = "Hint: pyPolarionCli prints all program arguments incl. the password in verbose mode, which conflicts with stk_req_credential_protection. Its version has to be fixed like bmw-lobster, see stk_constraint_lobster_latest."
+        }
+
+        StkConstraint stk_constraint_lobster_latest {
+            description = "The tool shall be compatible with bmw-lobster 1.0.6."
+            rationale = "At project start 1.0.6 is the latest released version. A tool qualification according to ISO 26262-8 requires a fixed, qualified version instead of a moving latest version."
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+    }
+}

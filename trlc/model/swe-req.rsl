@@ -1,0 +1,19 @@
+package SwRequirements
+import AbstractRequirements
+import StakeholderRequirements
+
+// Functional Software Requirement
+type SwReq extends AbstractRequirements.Requirement {
+    verification_criteria   String
+    derived_from            StakeholderRequirements.StkReq [1 .. *]
+}
+
+// Non-Functional Software Requirement
+type SwReqNonFunc extends AbstractRequirements.Requirement {
+    derived_from            StakeholderRequirements.StkReq [1 .. *]
+}
+
+// Software Constraint
+type SwConstraint extends AbstractRequirements.Requirement {
+    derived_from optional   StakeholderRequirements.StkConstraint [1 .. *]
+}
