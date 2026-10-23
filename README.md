@@ -3,6 +3,7 @@
 [![License](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://choosealicense.com/licenses/gpl-3.0/) [![Repo Status](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 
 - [Overview](#overview)
+- [Context Diagram](#context-diagram)
 - [Development Status](#development-status)
 - [Installation](#installation)
 - [SW Documentation](#sw-documentation)
@@ -23,6 +24,10 @@ which closes the same gap for Codebeamer.
 > lobster-polarion is not a standalone solution, but a component extending the
 > [BMW LOBSTER tooling](https://github.com/bmw-software-engineering/lobster). Understanding of the LOBSTER tool purpose and usage
 > is required to benefit from lobster-polarion.
+
+## Context Diagram
+
+![context](https://www.plantuml.com/plantuml/proxy?cache=no&src=https://raw.githubusercontent.com/NewTec-GmbH/lobster-polarion/refs/heads/main/doc/diagrams/lobster-polarion_context.plantuml)
 
 ## Development Status
 
