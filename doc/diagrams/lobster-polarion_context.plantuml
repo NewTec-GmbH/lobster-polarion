@@ -1,0 +1,31 @@
+@startuml
+title lobster-polarion - System Context
+
+actor "Human/CI" as Human
+rectangle "lobster-polarion" as Tool
+cloud "Polarion instance\nSOAP API" as Polarion
+folder "YAML configuration\npolarion-config.yaml" as Config
+file "Optional input\nLOBSTER .lobster file" as Input
+file "Output\n<configured .lobster path>\nDefault: polarion.lobster" as Output
+folder "~/.netrc" as Netrc
+rectangle "LOBSTER interchange\nand report tools" as LobsterCore
+rectangle "Console" as Console
+
+Human --> Tool : CLI
+Config --> Tool : YAML\nconfiguration
+Input --> Tool : .lobster JSON\n(any supported schema;\nunresolved req references)
+Netrc --> Tool : login/password\nfallback credentials
+Tool --> Polarion : SOAP query\nSOAP over HTTPS + auth
+Polarion --> Tool : SOAP work items\nfields and relationships
+Tool --> Output : .lobster JSON\nPolarion work items
+Tool --> Console : progress, warnings,\nerrors, exit code
+Output --> LobsterCore : .lobster interchange\nJSON artifact
+
+note right of Tool
+Single black-box boundary.
+
+Import modes:
+import_query or import_tagged.
+end note
+
+@enduml
