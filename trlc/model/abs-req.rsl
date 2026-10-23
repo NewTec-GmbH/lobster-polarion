@@ -1,0 +1,18 @@
+package AbstractRequirements
+
+// The validation state.
+// deferred: Accepted by the stakeholder, but not part of the current release.
+enum VALID_STATUS {
+    valid
+    rejected
+    approved
+    deferred
+}
+
+// Abstract requirement which contains the generic attributes for all types.
+abstract type Requirement {
+    description             String
+    valid_status            VALID_STATUS
+    note        optional    String
+    derived     optional    Requirement [0 .. *]
+}

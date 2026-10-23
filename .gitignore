@@ -216,3 +216,21 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# lobster-polarion ***************************************************************
+
+# Default output file
+lobster.json
+
+# Tests
+tests/utils/output-test.json
+
+# Downloaded tools
+tools/plantUML/plantuml.jar
+
+# Generated files
+tools/traceReport/out
+tools/trlc2other/out
+tools/testReport/out
+tools/deployDoc/build
+tools/deployDoc/source/api
