@@ -32,12 +32,12 @@ section "Stakeholder Requirements" {
             valid_status = AbstractRequirements.VALID_STATUS.valid
         }
 
-        StkReq stk_req_offline { !! Only if Lobster Codebeamer is also able to do
+        StkReq stk_req_offline {
             description = "The tool shall be usable without a connection to the Polarion server (offline), e.g. by converting a previously exported Polarion file."
             rationale = "The tracing report may have to be created in environments without access to the Polarion server, e.g. in an isolated build pipeline."
             acceptance_criteria = "A LOBSTER tracing report is created from Polarion work items without network access to the Polarion server."
-            valid_status = AbstractRequirements.VALID_STATUS.valid
-            note = "Open issue: Is an offline usage needed at all? If yes, which input (e.g. Polarion export format XML/JSON/ReqIF) shall be supported?"
+            valid_status = AbstractRequirements.VALID_STATUS.rejected
+            note = "Rejected by the stakeholder: An offline usage is only required if lobster-codebeamer supports it, which is not the case (lobster-codebeamer reads the items via the Codebeamer REST API only)."
         }
 
         StkReq stk_req_version {
@@ -74,15 +74,15 @@ section "Stakeholder Requirements" {
 
     section "Content of the LOBSTER Items" {
 
-        StkReq stk_req_item_content { !! (Zwischenformat erzeugen, nicht Lobster) common interchange format for LOBSTER. !!
-            description = "Each exported LOBSTER item shall contain the mandatory work item fields id, title, description, author (name and id) and creation date. The description shall be converted from Polarion rich text (HTML) into plain text; a work item without description is valid. The user shall be able to configure further work item fields (incl. custom fields), which are added to the item text."
+        StkReq stk_req_item_content {
+            description = "Each work item exported into the LOBSTER common interchange format shall contain the mandatory work item fields id, title, description, author (name and id) and creation date. The description shall be converted from Polarion rich text (HTML) into plain text; a work item without description is valid. The user shall be able to configure further work item fields (incl. custom fields), which are added to the item text."
             rationale = "The tracing report shall be understandable without opening Polarion. The mandatory fields are the ones the Polarion ReqIF export maps to the ReqIF standard attributes (ReqIF.ForeignID, ReqIF.ChapterName, ReqIF.Text, ReqIF.ForeignCreatedBy, ReqIF.ForeignCreatedOn) for every work item type. Which further fields are relevant depends on the Polarion project configuration. lobster-codebeamer provides 'item_to_text' for the same purpose."
             acceptance_criteria = "The tracing report shows id, title, description, author (name and id) and creation date of each work item and the values of the configured further fields. The description contains no HTML markup. A work item without description is exported without failure."
             valid_status = AbstractRequirements.VALID_STATUS.valid
             note = "Open issue: Is a configuration of further fields needed at all (the Polarion ReqIF export offers this via 'Add Attribute')? To be clarified"
         }
 
-        StkReq stk_req_item_schema { !! 
+        StkReq stk_req_item_schema {
             description = "The user shall be able to choose per export, whether the selected work items are mapped to LOBSTER requirements, implementations or activities. The id of the Polarion work item type (e.g. 'systemrequirement', 'testcase'), not its display name, shall be taken over as the kind of the LOBSTER item."
             rationale = "Polarion does not only contain requirements, but e.g. also test cases, which are activities in LOBSTER. A LOBSTER file contains items of exactly one schema, so the mapping is defined per export. Equivalent to 'schema' of lobster-codebeamer."
             acceptance_criteria = "The output file uses the chosen LOBSTER schema (lobster-req-trace, lobster-imp-trace or lobster-act-trace) and each item shows the id of the Polarion work item type as its kind."
@@ -90,20 +90,20 @@ section "Stakeholder Requirements" {
             note = "Open issue: Is one schema per export sufficient, or is a mapping table 'Polarion work item type -> LOBSTER schema' needed, which splits one selection into several output files?"
         }
 
-        StkReq stk_req_item_references { !! To be clarified with AM (Like Codebeamer)
+        StkReq stk_req_item_references {
             description = "The user shall be able to take over links between work items as LOBSTER references, selectable by the link role. Links to work items of other Polarion projects shall be supported."
             rationale = "Tracing between work items is managed in Polarion by links, e.g. a software requirement 'refines' a system requirement. LOBSTER shall be able to report these traces. Equivalent to 'refs' of lobster-codebeamer."
             acceptance_criteria = "Links with the selected roles are shown as traces in the tracing report, links with other roles are not. A link to a work item of another project references this work item including its project."
             valid_status = AbstractRequirements.VALID_STATUS.valid
-            note = "Open issue: Part of the first release or deferred to a future version? Polarion provides a 'suspect' flag per link; shall suspect links be marked in the tracing report?"
+            note = "Decision of the stakeholder: Same as lobster-codebeamer ('refs'), part of the first release. The Polarion 'suspect' flag of a link is not evaluated, as lobster-codebeamer has no equivalent."
         }
 
-        StkReq stk_req_navigation { ??
+        StkReq stk_req_navigation {
             description = "The user shall be able to navigate from an item in the tracing report to the work item in Polarion."
             rationale = "Reviewing the traces requires access to the complete work item."
             acceptance_criteria = "Each work item in the HTML tracing report contains a working link to the work item in Polarion. Until a Polarion location kind is available in LOBSTER, the Polarion work item id is shown as plain text instead."
-            valid_status = AbstractRequirements.VALID_STATUS.valid
-            note = "LOBSTER 1.0.6 only supports the location kinds 'file', 'github', 'codebeamer' and 'void'. Decision of the stakeholder: A Polarion location kind shall be contributed to BMW LOBSTER. The fulfillment of this requirement depends on the acceptance of the contribution by BMW."
+            valid_status = AbstractRequirements.VALID_STATUS.deferred
+            note = "LOBSTER 1.0.6 only supports the location kinds 'file', 'github', 'codebeamer' and 'void'. Decision of the stakeholder: Deferred until LOBSTER supports a Polarion location kind. A Polarion location kind shall be contributed to BMW LOBSTER. The fulfillment of this requirement depends on the acceptance of the contribution by BMW."
         }
     }
 
@@ -221,12 +221,4 @@ section "Stakeholder Requirements" {
             valid_status = AbstractRequirements.VALID_STATUS.valid
         }
     }
-}
-
-
-
-Codebeamer Detailansicht
-    - Kontext Diagram
-
-Lobster - Polarion 
-    - Kontext Diagram 
+}
