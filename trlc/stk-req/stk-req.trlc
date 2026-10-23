@@ -32,7 +32,7 @@ section "Stakeholder Requirements" {
             valid_status = AbstractRequirements.VALID_STATUS.valid
         }
 
-        StkReq stk_req_offline { !!
+        StkReq stk_req_offline { !! Only if Lobster Codebeamer is also able to do
             description = "The tool shall be usable without a connection to the Polarion server (offline), e.g. by converting a previously exported Polarion file."
             rationale = "The tracing report may have to be created in environments without access to the Polarion server, e.g. in an isolated build pipeline."
             acceptance_criteria = "A LOBSTER tracing report is created from Polarion work items without network access to the Polarion server."
@@ -74,7 +74,7 @@ section "Stakeholder Requirements" {
 
     section "Content of the LOBSTER Items" {
 
-        StkReq stk_req_item_content { !!
+        StkReq stk_req_item_content { !! (Zwischenformat erzeugen, nicht Lobster) common interchange format for LOBSTER. !!
             description = "Each exported LOBSTER item shall contain the mandatory work item fields id, title, description, author (name and id) and creation date. The description shall be converted from Polarion rich text (HTML) into plain text; a work item without description is valid. The user shall be able to configure further work item fields (incl. custom fields), which are added to the item text."
             rationale = "The tracing report shall be understandable without opening Polarion. The mandatory fields are the ones the Polarion ReqIF export maps to the ReqIF standard attributes (ReqIF.ForeignID, ReqIF.ChapterName, ReqIF.Text, ReqIF.ForeignCreatedBy, ReqIF.ForeignCreatedOn) for every work item type. Which further fields are relevant depends on the Polarion project configuration. lobster-codebeamer provides 'item_to_text' for the same purpose."
             acceptance_criteria = "The tracing report shows id, title, description, author (name and id) and creation date of each work item and the values of the configured further fields. The description contains no HTML markup. A work item without description is exported without failure."
@@ -82,7 +82,7 @@ section "Stakeholder Requirements" {
             note = "Open issue: Is a configuration of further fields needed at all (the Polarion ReqIF export offers this via 'Add Attribute')? To be clarified"
         }
 
-        StkReq stk_req_item_schema { !!
+        StkReq stk_req_item_schema { !! 
             description = "The user shall be able to choose per export, whether the selected work items are mapped to LOBSTER requirements, implementations or activities. The id of the Polarion work item type (e.g. 'systemrequirement', 'testcase'), not its display name, shall be taken over as the kind of the LOBSTER item."
             rationale = "Polarion does not only contain requirements, but e.g. also test cases, which are activities in LOBSTER. A LOBSTER file contains items of exactly one schema, so the mapping is defined per export. Equivalent to 'schema' of lobster-codebeamer."
             acceptance_criteria = "The output file uses the chosen LOBSTER schema (lobster-req-trace, lobster-imp-trace or lobster-act-trace) and each item shows the id of the Polarion work item type as its kind."
@@ -90,7 +90,7 @@ section "Stakeholder Requirements" {
             note = "Open issue: Is one schema per export sufficient, or is a mapping table 'Polarion work item type -> LOBSTER schema' needed, which splits one selection into several output files?"
         }
 
-        StkReq stk_req_item_references { !! To be clarified with AM
+        StkReq stk_req_item_references { !! To be clarified with AM (Like Codebeamer)
             description = "The user shall be able to take over links between work items as LOBSTER references, selectable by the link role. Links to work items of other Polarion projects shall be supported."
             rationale = "Tracing between work items is managed in Polarion by links, e.g. a software requirement 'refines' a system requirement. LOBSTER shall be able to report these traces. Equivalent to 'refs' of lobster-codebeamer."
             acceptance_criteria = "Links with the selected roles are shown as traces in the tracing report, links with other roles are not. A link to a work item of another project references this work item including its project."
@@ -116,7 +116,7 @@ section "Stakeholder Requirements" {
             valid_status = AbstractRequirements.VALID_STATUS.valid
         }
 
-        StkReq stk_req_authentication { !! pyPolarionCli uses CLA, so the password is written in the logs afterwards !! -> maybe Issue of pyPolarionCli??
+        StkReq stk_req_authentication {
             description = "The tool shall authenticate at Polarion either with user and password or with user and personal access token. If a token is given, it shall be used instead of the password. The password and the token shall not be given as command line arguments or in the configuration file."
             rationale = "Command line arguments are visible in the process list and the shell history of the host, and the configuration file is under version control. Environment variables can be filled directly from the secrets of a build pipeline. The login concept (user with password or token) is the same as in pyPolarionCli, see stk_constraint_pypolarioncli."
             acceptance_criteria = "The tool accesses Polarion with user and password as well as with user and token, given via environment variables. The tool provides no command line argument and no configuration file setting for the password or the token."
@@ -130,8 +130,8 @@ section "Stakeholder Requirements" {
             valid_status = AbstractRequirements.VALID_STATUS.valid
         }
 
-        StkReq stk_req_network { ?? pyPolarionCli just gives Warning by now (configurable)
-            description = "The tool shall access Polarion via HTTPS with certificate verification and shall support company networks with own certificate authorities and proxies."
+        StkReq stk_req_network {
+            description = "The tool shall access Polarion via HTTPS with certificate verification and shall support company networks with own certificate authorities and proxies (Default On)."
             rationale = "Polarion servers are typically operated in company networks."
             acceptance_criteria = "The tool accesses a Polarion server, whose certificate is issued by a company certificate authority, via a proxy."
             valid_status = AbstractRequirements.VALID_STATUS.valid
@@ -215,13 +215,6 @@ section "Stakeholder Requirements" {
             valid_status = AbstractRequirements.VALID_STATUS.valid
         }
 
-        StkConstraint stk_constraint_pypolarioncli {
-            description = "The tool shall access Polarion by using pyPolarionCli (https://github.com/NewTec-GmbH/pyPolarionCli) as a Python library."
-            rationale = "Reuse of the existing NewTec Polarion access instead of a second implementation eases the maintenance."
-            valid_status = AbstractRequirements.VALID_STATUS.valid
-            note = "Hint: pyPolarionCli prints all program arguments incl. the password in verbose mode, which conflicts with stk_req_credential_protection. Its version has to be fixed like bmw-lobster, see stk_constraint_lobster_latest."
-        }
-
         StkConstraint stk_constraint_lobster_latest {
             description = "The tool shall be compatible with bmw-lobster 1.0.6."
             rationale = "At project start 1.0.6 is the latest released version."
@@ -229,3 +222,11 @@ section "Stakeholder Requirements" {
         }
     }
 }
+
+
+
+Codebeamer Detailansicht
+    - Kontext Diagram
+
+Lobster - Polarion 
+    - Kontext Diagram 

@@ -1,0 +1,48 @@
+@startuml
+title lobster-codebeamer - System Context
+
+actor "Human/CI" as Human
+rectangle "lobster-codebeamer" as Tool
+cloud "Codebeamer instance\nREST API v3" as Codebeamer
+folder "YAML configuration\ncodebeamer-config.yaml" as Config
+file "Optional input\nsource.lobster" as Input
+file "Output\n<configured .lobster path> \n Default: codebeamer.lobster" as Output
+folder "~/.netrc" as Netrc
+rectangle "LOBSTER interchange\nand report tools" as LobsterCore
+rectangle "Console" as Console
+
+Human --> Tool : CLI
+Config --> Tool : YAML\nimport and transport settings
+Input --> Tool : .lobster JSON\nunresolved req tags
+Netrc --> Tool : login/password\nfallback credentials
+Tool --> Codebeamer : HTTPS GET\nREST API v3 + authentication
+Codebeamer --> Tool : JSON API pages\nitems / page / total
+Tool --> Output : .lobster JSON\nCodebeamer items
+Tool --> Console : progress, warnings,\nerrors, exit code
+Output --> LobsterCore : .lobster interchange\nJSON artifact
+
+note right of Tool
+Single black-box boundary.
+
+Import modes:
+1. import_query
+   report ID or cbQL
+2. import_tagged
+   resolve req tags
+
+Read-only extraction:
+Codebeamer -> LOBSTER
+end note
+
+note right of Codebeamer
+Query sources:
+- saved report ID
+- cbQL query
+- IDs from unresolved req references
+  in any supported input schema
+
+Response contract:
+page, pageSize, total, items
+end note
+
+@enduml
