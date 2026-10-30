@@ -1,0 +1,60 @@
+@startuml use_case
+
+' Setting ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+left to right direction
+
+<style>
+actor {
+  BackgroundColor #E3F2FD
+  LineColor #1E88E5
+  FontColor #0D47A1
+  FontWeight bold
+}
+
+usecase {
+  BackgroundColor #E8F5E9
+  BorderColor #388E3C
+  FontColor #1B5E20
+  RoundCorner 20
+  FontSize 12
+  FontStyle bold
+}
+</style>
+
+' Components '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+actor "User" as user
+file "Configuration file\n(*.yaml)" as configuration <<file>>
+file "LOBSTER common interchange format file\nwith references (*.lobster)" as lobster_input <<file>>
+
+rectangle "System" {
+    usecase "Show tool version" as uc_version
+    usecase "Print command overview to console" as uc_help
+    usecase "Import Polarion work items" as uc_import
+    usecase "Select work items by query" as uc_select_query
+    usecase "Select work items by references" as uc_select_tagged
+    usecase "Use baseline" as uc_baseline
+    usecase "Query Polarion work items" as uc_query
+    usecase "Generate LOBSTER common interchange format file" as uc_output
+}
+
+actor "Polarion ALM" as polarion
+file "LOBSTER common interchange format file\n(*.lobster)" as lobster_output <<file>>
+
+' Flows ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+user --> uc_help : request help
+user --> uc_version : request version
+user --> uc_import : request import
+configuration --> uc_import
+lobster_input --> uc_select_tagged
+uc_import ..> uc_query : <<include>>
+uc_import ..> uc_output : <<include>>
+uc_import <.. uc_select_query : <<extend>>
+uc_import <.. uc_select_tagged : <<extend>>
+uc_query <.. uc_baseline : <<extend>>
+uc_query <--> polarion
+uc_output --> lobster_output
+
+@enduml
