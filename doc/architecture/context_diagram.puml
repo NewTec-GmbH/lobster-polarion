@@ -1,0 +1,50 @@
+@startuml context_diagram
+
+' Setting ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+skinparam linetype ortho
+<style>
+component {
+    BackgroundColor #lightgreen
+}
+.config {
+    BackgroundColor #orange
+}
+</style>
+
+' Components '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+package "Input" {
+    file "Configuration (*.yaml)" as configuration <<config>>
+    file "<U+007E>/.netrc" as netrc <<config>>
+    file "LOBSTER common interchange\nformat file (*.lobster)" as lobster_input <<file>>
+
+    note left of lobster_input
+        Optional, only used
+        by import_tagged
+    end note
+}
+
+package "Polarion ALM" {
+    component "Polarion SOAP API" as polarion <<server>>
+}
+
+package "System" {
+    component "lobster-polarion" as lobster_polarion <<tool>>
+}
+
+package LOBSTER {
+    file "LOBSTER common interchange\nformat file (*.lobster)" as lobster_output <<file>>
+    component "lobster-report" as lobster_report <<tool>>
+}
+
+' Flows ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+lobster_polarion .up.> configuration : <<use>>
+lobster_polarion .up.> netrc : <<use>>
+lobster_input .down.> lobster_polarion : <<input>>
+lobster_polarion <.down.> polarion : <<request / response>>
+lobster_polarion .down.> lobster_output : <<generates>>
+lobster_output .down.> lobster_report : <<input>>
+
+@enduml
