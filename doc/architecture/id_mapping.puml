@@ -1,0 +1,39 @@
+@startuml id_mapping
+
+' Setting ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+left to right direction
+
+' Components '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+package "Polarion ALM" {
+    map "Work item" as work_item {
+        project => <U+003C>project id<U+003E>
+        id => <U+003C>work item id<U+003E>
+    }
+}
+
+package "TRLC" {
+    map "TRLC record" as trlc_record {
+        <U+003C>reference attribute<U+003E> => <U+003C>project id<U+003E>:<U+003C>work item id<U+003E>
+    }
+}
+
+package "LOBSTER common interchange format" {
+    map "LOBSTER item (Polarion)" as lobster_item_polarion {
+        tag => req <U+003C>project id<U+003E>:<U+003C>work item id<U+003E>
+    }
+
+    map "LOBSTER item (TRLC)" as lobster_item_trlc {
+        refs => req <U+003C>project id<U+003E>:<U+003C>work item id<U+003E>
+    }
+}
+
+' Flows ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+work_item::project --> lobster_item_polarion::tag : lobster-polarion
+work_item::id --> lobster_item_polarion::tag
+trlc_record --> lobster_item_trlc::refs : lobster-trlc
+lobster_item_trlc::refs ..> lobster_item_polarion::tag : <<trace>>
+
+@enduml

@@ -20,6 +20,21 @@ configuration file:
 
 Optionally the work items are queried from a Polarion baseline instead of the current state (use baseline).
 
+## Preconditions
+
+Polarion is the source of the higher level work items (e.g. stakeholder requirements). The lower level items
+(e.g. TRLC records or source code) reference them, lobster-polarion has no knowledge about TRLC.
+
+![id mapping](./architecture/id_mapping.png)
+
+- A TRLC record holds the referenced Polarion work items in a reference attribute. The attribute is defined by the
+  user in the TRLC model with any name and is configured as `tags` field in the lobster-trlc configuration, which
+  maps its values to `req` references.
+- Polarion work item ids are only unique within a Polarion project. Therefore a reference contains the Polarion
+  project id and the work item id in the format `<project id>:<work item id>`.
+- lobster-polarion generates the tag of each work item in the same format, so lobster-report can resolve the
+  references.
+
 ## Context Diagram
 
 The following picture shows the overall tool flow:
