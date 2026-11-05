@@ -4,47 +4,49 @@
 
 skinparam linetype ortho
 <style>
-component {
+.tool {
     BackgroundColor #lightgreen
 }
-.config {
-    BackgroundColor #orange
+.external {
+    BackgroundColor #lightgrey
+}
+.data {
+    BackgroundColor #lightyellow
 }
 </style>
 
 ' Components '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 package "Input" {
-    file "Configuration (*.json)" as configuration <<config>>
-    file "Environment variables" as env_variables <<config>>
-    file "LOBSTER common interchange\nformat file (*.lobster)" as lobster_input <<file>>
-
-    note left of lobster_input
-        Optional, only used
-        by import_tagged
-    end note
+    file "Configuration (*.json)" as configuration <<data>>
 }
 
 package "Polarion ALM" {
-    component "Polarion SOAP API" as polarion <<server>>
+    component "Polarion SOAP API" as polarion <<external>>
 }
 
-package "System" {
+package "lobster-polarion" {
     component "lobster-polarion" as lobster_polarion <<tool>>
 }
 
 package LOBSTER {
-    file "LOBSTER common interchange\nformat file (*.lobster)" as lobster_output <<file>>
-    component "lobster-report" as lobster_report <<tool>>
+    file "LOBSTER common interchange\nformat file (*.lobster)" as lobster_output <<data>>
+    component "lobster-report" as lobster_report <<external>>
 }
 
 ' Flows ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 lobster_polarion .up.> configuration : <<use>>
-lobster_polarion .up.> env_variables : <<use>>
-lobster_input .down.> lobster_polarion : <<input>>
 lobster_polarion <.down.> polarion : <<request / response>>
 lobster_polarion .down.> lobster_output : <<generates>>
 lobster_output .down.> lobster_report : <<input>>
+
+' Legend ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+legend right
+    |<back:lightgreen>      </back>| Scope of lobster-polarion |
+    |<back:lightgrey>      </back>| External system / tool |
+    |<back:lightyellow>      </back>| Data at the interfaces |
+endlegend
 
 @enduml

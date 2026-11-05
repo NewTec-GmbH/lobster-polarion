@@ -11,12 +11,12 @@ LOBSTER common interchange format. This allows to use Polarion work items in a L
 ![use case diagram](./architecture/use_case.png)
 
 The main use case is the import of Polarion work items. It always queries the work items from Polarion and generates
-the LOBSTER common interchange format file. Which work items are imported depends on the import mode in the
-configuration file:
+the LOBSTER common interchange format file. The work items are selected by a Polarion query (`import_query`) in the
+configuration file. This imports also work items which are not referenced yet, so the tracing report shows the
+missing coverage.
 
-- Select work items by query (`import_query`): The work items are selected by a Polarion query.
-- Select work items by references (`import_tagged`): The work items are selected by the `req` references of an
-  existing LOBSTER common interchange format file, e.g. the output of lobster-python.
+In contrast to lobster-codebeamer there is no selection by references (`import_tagged`), because it imports only
+the referenced work items and therefore can't show missing coverage.
 
 Optionally the work items are queried from a Polarion baseline instead of the current state (use baseline).
 
@@ -37,14 +37,12 @@ Polarion is the source of the higher level work items (e.g. stakeholder requirem
 
 ## Context Diagram
 
-The following picture shows the overall tool flow:
+The following picture shows the execution context of the tool:
 
 ![context diagram](./architecture/context_diagram.png)
 
-| Interface                                                | Direction | Description                                                                         |
-| -------------------------------------------------------- | --------- | ----------------------------------------------------------------------------------- |
-| Configuration (*.json)                                   | In        | Polarion server, project, import mode and mapping to the LOBSTER items.             |
-| Environment variables                                    | In        | Credentials for Polarion (user and password or token).                              |
-| LOBSTER common interchange format file (*.lobster)       | In        | Optional, only used by `import_tagged`. Contains the `req` references.              |
-| Polarion SOAP API                                        | In / Out  | Request of the work items and response with their fields and links.                 |
-| LOBSTER common interchange format file (*.lobster)       | Out       | Generated file with the Polarion work items. Input for lobster-report.              |
+| Interface                                          | Direction | Description                                                                                              |
+| -------------------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------- |
+| Configuration (*.json)                             | In        | Polarion server, credentials (user and password), project, import mode and mapping to the LOBSTER items. |
+| Polarion SOAP API                                  | In / Out  | Request of the work items and response with their fields and links.                                      |
+| LOBSTER common interchange format file (*.lobster) | Out       | Generated file with the Polarion work items. Input for lobster-report.                                   |
