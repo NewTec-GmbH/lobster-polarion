@@ -25,7 +25,7 @@ usecase {
 ' Components '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 actor "User" as user
-file "Configuration file\n(*.yaml)" as configuration <<file>>
+file "Configuration file\n(*.json)" as configuration <<file>>
 file "LOBSTER common interchange format file\nwith references (*.lobster)" as lobster_input <<file>>
 
 rectangle "System" {

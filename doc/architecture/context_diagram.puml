@@ -15,7 +15,7 @@ component {
 ' Components '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 package "Input" {
-    file "Configuration (*.yaml)" as configuration <<config>>
+    file "Configuration (*.json)" as configuration <<config>>
     file "<U+007E>/.netrc" as netrc <<config>>
     file "LOBSTER common interchange\nformat file (*.lobster)" as lobster_input <<file>>
 

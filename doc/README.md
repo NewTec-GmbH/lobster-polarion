@@ -28,7 +28,7 @@ The following picture shows the overall tool flow:
 
 | Interface                                                | Direction | Description                                                                         |
 | -------------------------------------------------------- | --------- | ----------------------------------------------------------------------------------- |
-| Configuration (*.yaml)                                   | In        | Polarion server, project, import mode and mapping to the LOBSTER items.             |
+| Configuration (*.json)                                   | In        | Polarion server, project, import mode and mapping to the LOBSTER items.             |
 | `~/.netrc`                                               | In        | Fallback for the credentials, if they are not given in the configuration.           |
 | LOBSTER common interchange format file (*.lobster)       | In        | Optional, only used by `import_tagged`. Contains the `req` references.              |
 | Polarion SOAP API                                        | In / Out  | Request of the work items and response with their fields and links.                 |

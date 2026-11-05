@@ -61,7 +61,7 @@ swe-test, src, tests) exist.
 ## Concept Reference
 
 The tool concept shall be similar to lobster-codebeamer
-(https://github.com/bmw-software-engineering/lobster/tree/main/packages/lobster-tool-codebeamer): YAML configuration file,
+(https://github.com/bmw-software-engineering/lobster/tree/main/packages/lobster-tool-codebeamer): JSON configuration file,
 selection by query / tagged items / baseline, `refs` from item links, selectable LOBSTER schema. The repository structure and
 Python code shall be similar to lobster-doxygen (https://github.com/NewTec-GmbH/lobster-doxygen).
 
