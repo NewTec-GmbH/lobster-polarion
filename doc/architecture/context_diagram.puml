@@ -16,7 +16,7 @@ component {
 
 package "Input" {
     file "Configuration (*.json)" as configuration <<config>>
-    file "<U+007E>/.netrc" as netrc <<config>>
+    file "Environment variables" as env_variables <<config>>
     file "LOBSTER common interchange\nformat file (*.lobster)" as lobster_input <<file>>
 
     note left of lobster_input
@@ -41,7 +41,7 @@ package LOBSTER {
 ' Flows ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 lobster_polarion .up.> configuration : <<use>>
-lobster_polarion .up.> netrc : <<use>>
+lobster_polarion .up.> env_variables : <<use>>
 lobster_input .down.> lobster_polarion : <<input>>
 lobster_polarion <.down.> polarion : <<request / response>>
 lobster_polarion .down.> lobster_output : <<generates>>
