@@ -53,7 +53,7 @@ The tool is developed according to the V-model. The current development status i
 The requirements, architecture and tests will be written in [TRLC](https://github.com/bmw-software-engineering/trlc) and
 located in the `trlc` folder.
 
-The software architecture is described in the [documentation](./doc/README.md) subpage.
+The tool concept is described in the [documentation](./doc/README.md) subpage.
 
 ## Used Libraries
 
