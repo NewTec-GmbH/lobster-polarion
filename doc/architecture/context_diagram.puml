@@ -1,0 +1,52 @@
+@startuml context_diagram
+
+' Setting ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+skinparam linetype ortho
+<style>
+.tool {
+    BackgroundColor #lightgreen
+}
+.external {
+    BackgroundColor #lightgrey
+}
+.data {
+    BackgroundColor #lightyellow
+}
+</style>
+
+' Components '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+package "Input" {
+    file "Configuration (*.json)" as configuration <<data>>
+}
+
+package "Polarion ALM" {
+    component "Polarion SOAP API" as polarion <<external>>
+}
+
+package "lobster-polarion" {
+    component "lobster-polarion" as lobster_polarion <<tool>>
+}
+
+package LOBSTER {
+    file "LOBSTER common interchange\nformat file (*.lobster)" as lobster_output <<data>>
+    component "lobster-report" as lobster_report <<external>>
+}
+
+' Flows ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+lobster_polarion .up.> configuration : <<use>>
+lobster_polarion <.down.> polarion : <<request / response>>
+lobster_polarion .down.> lobster_output : <<generates>>
+lobster_output .down.> lobster_report : <<input>>
+
+' Legend ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+legend right
+    |<back:lightgreen>      </back>| Scope of lobster-polarion |
+    |<back:lightgrey>      </back>| External system / tool |
+    |<back:lightyellow>      </back>| Data at the interfaces |
+endlegend
+
+@enduml

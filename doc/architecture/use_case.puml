@@ -1,0 +1,47 @@
+@startuml use_case
+
+' Setting ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+left to right direction
+
+<style>
+actor {
+  BackgroundColor #E3F2FD
+  LineColor #1E88E5
+  FontColor #0D47A1
+  FontWeight bold
+}
+
+usecase {
+  BackgroundColor #E8F5E9
+  BorderColor #388E3C
+  FontColor #1B5E20
+  RoundCorner 20
+  FontSize 12
+  FontStyle bold
+}
+</style>
+
+' Components '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+actor "User" as user
+
+rectangle "System" {
+    usecase "Show tool version" as uc_version
+    usecase "Print command overview to console" as uc_help
+    usecase "Import Polarion work items" as uc_import
+    usecase "Use baseline" as uc_baseline
+    usecase "Query Polarion work items" as uc_query
+    usecase "Generate LOBSTER common interchange format file" as uc_output
+}
+
+' Flows ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+user --> uc_help : request help
+user --> uc_version : request version
+user --> uc_import : request import
+uc_import ..> uc_query : <<include>>
+uc_import ..> uc_output : <<include>>
+uc_query <.. uc_baseline : <<extend>>
+
+@enduml
