@@ -1,0 +1,25 @@
+@startuml overview
+skinparam componentStyle uml2
+left to right direction
+
+package "Project" {
+    file "Configuration (*.json)" as configuration
+}
+
+package "Polarion ALM" {
+    file "Work items\n(e.g. requirements)" as work_items
+}
+
+[lobster-polarion] as lobster_polarion <<tool>> #lightgreen
+
+file "LOBSTER common interchange\nformat file (*.lobster)" as output #lightblue
+
+rectangle "LOBSTER" {
+    component "lobster-report" as lobster_report
+}
+
+configuration --> lobster_polarion
+work_items --> lobster_polarion
+lobster_polarion --> output : generate
+output --> lobster_report : input
+@enduml
