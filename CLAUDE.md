@@ -8,24 +8,23 @@ The tool is developed strictly according to the V-model and every work result is
 
 - **Never skip ahead.** Only produce the artefacts of the current phase. Do not write architecture, code or tests before the
   requirements they are based on exist and were reviewed. Ask if unsure which phase is active (see the GitHub issues).
-- Left side: stakeholder requirements → SW requirements → SW architecture → implementation.
-  Right side: SW tests (verify SW requirements) → tool qualification tests (verify stakeholder requirements).
+- Left side: SW requirements → SW architecture → implementation. There are no stakeholder requirements in this
+  project; the structure follows [trlc-doc](https://github.com/nhjschulz/trlc-doc).
+  Right side: SW tests (verify SW requirements).
 - One PR per feature; the PR contains the artefacts of the feature in the order of the V-model.
 - Open questions are recorded in the `note` attribute with the prefix `Open issue:` and must be resolved in the review.
   Rejected requirements are kept with `valid_status = AbstractRequirements.VALID_STATUS.rejected`.
 
 ### Traceability
 
-| Level                   | TRLC                        | Traces to (field)                                 |
-| ----------------------- | --------------------------- | ------------------------------------------------- |
-| Stakeholder requirement | `trlc/stk-req` (`StkReq`)   | -                                                 |
-| Stakeholder constraint  | `trlc/stk-req` (`StkConstraint`) | -                                            |
-| SW requirement          | `trlc/swe-req` (`SwReq`)    | `derived_from` → `StkReq` (mandatory)             |
-| SW constraint           | `trlc/swe-req` (`SwConstraint`) | `derived_from` → `StkConstraint` (optional)   |
-| SW architecture         | `trlc/swe-arch` (`SwArchSpec`) | `satisfies` → SW requirements                  |
-| SW test case            | `trlc/swe-test` (`SwTestCase`) | `verifies` → `SwReq`                           |
-| Code                    | `src/lobster_polarion`      | `# lobster-trace: SwRequirements.<id>`            |
-| Test code               | `tests`                     | `# lobster-trace: SwTests.<id>` + `record_property("lobster-trace", "SwTests.<id>")` |
+| Level                   | TRLC                                     | Traces to (field)                                                                    |
+| ----------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------ |
+| SW requirement          | `trlc/swe-req` (`SwReq`, `SwReqNonFunc`) | -                                                                                    |
+| SW constraint           | `trlc/swe-req` (`SwConstraint`)          | -                                                                                    |
+| SW architecture         | `trlc/swe-arch` (`SwArchSpec`)           | `satisfies` → SW requirements                                                        |
+| SW test case            | `trlc/swe-test` (`SwTestCase`)           | `verifies` → `SwReq`                                                                 |
+| Code                    | `src/lobster_polarion`                   | `# lobster-trace: SwRequirements.<id>`                                               |
+| Test code               | `tests`                                  | `# lobster-trace: SwTests.<id>` + `record_property("lobster-trace", "SwTests.<id>")` |
 
 The tracing policy will be defined in `tools/traceReport/lobster-report-sw-req.conf` (not yet present, added together with
 the SW requirements). Do not remove trace comments when modifying traced functions. Do not annotate a class *and* its methods — lobster-python ignores the method traces then.

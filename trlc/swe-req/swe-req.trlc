@@ -1,0 +1,449 @@
+package SwRequirements
+import AbstractRequirements
+import Generic
+
+section "lobster-polarion" {
+
+    Generic.Info sw_req_info_about_sw_req {
+        description =
+            '''
+            This file contains the software requirements for lobster-polarion, a tool to provide Polarion work items
+            in the LOBSTER common interchange format.
+
+            [LOBSTER](https://github.com/bmw-software-engineering/lobster) creates tracing reports, but can't read
+            Polarion work items. lobster-polarion closes this gap, like lobster-codebeamer does for Codebeamer.
+            '''
+    }
+
+    Generic.PlantUML sw_req_info_overview_diagram {
+        caption = "Tool Operation Overview"
+        file_path = "img/overview.puml"
+    }
+
+    section "Software Requirements" {
+
+        section "General" {
+
+            SwReq sw_req_read_work_items {
+                description =
+                    '''
+                    The software shall read the selected work items from Polarion.
+                    '''
+                verification_criteria =
+                    '''
+                    The software reads exactly the work items of the selection, see `sw_req_select_query`.
+                    '''
+                valid_status = AbstractRequirements.VALID_STATUS.valid
+                note =
+                    '''
+                    Polarion is the source of the higher level work items (e.g. stakeholder requirements).
+                    '''
+            }
+
+            SwReq sw_req_output_lobster {
+                description =
+                    '''
+                    The software shall output the read work items as a file in the LOBSTER common interchange format.
+                    '''
+                verification_criteria =
+                    '''
+                    `lobster-report` accepts the file without errors and shows the work items in the tracing report.
+                    '''
+                valid_status = AbstractRequirements.VALID_STATUS.valid
+                note =
+                    '''
+                    The work items shall appear in a LOBSTER tracing report together with the lower level items (e.g.
+                    TRLC records, source code) which reference them.
+                    '''
+            }
+
+            SwReq sw_req_cli {
+                description =
+                    '''
+                    The software shall be a command line tool, which runs without user interaction.
+                    '''
+                verification_criteria =
+                    '''
+                    The software runs in a build pipeline without user interaction and signals success or failure by its
+                    exit code.
+                    '''
+                valid_status = AbstractRequirements.VALID_STATUS.valid
+                note =
+                    '''
+                    The LOBSTER tools are command line tools and typically run in build pipelines.
+                    '''
+            }
+
+            SwReq sw_req_help {
+                description =
+                    '''
+                    The software shall show a help page with all available command line arguments on request (e.g. `-h`,
+                    `--help`).
+                    '''
+                verification_criteria =
+                    '''
+                    The help page shows all command line arguments with a short description.
+                    '''
+                valid_status = AbstractRequirements.VALID_STATUS.valid
+                note =
+                    '''
+                    The user shall be able to use the tool without further documentation.
+                    '''
+            }
+
+            SwReq sw_req_version {
+                description =
+                    '''
+                    The software shall show its version on request (e.g. `-v`, `--version`).
+                    '''
+                verification_criteria =
+                    '''
+                    The shown version is equal to the released version of the tool.
+                    '''
+                valid_status = AbstractRequirements.VALID_STATUS.valid
+                note =
+                    '''
+                    The used tool version must be identifiable, e.g. for a tool qualification.
+                    '''
+            }
+        }
+
+        section "Selection of Work Items" {
+
+            SwReq sw_req_select_query {
+                description =
+                    '''
+                    The user shall be able to select the work items by a Polarion query.
+                    '''
+                verification_criteria =
+                    '''
+                    Exactly the work items matching the query are selected.
+                    '''
+                valid_status = AbstractRequirements.VALID_STATUS.valid
+                note =
+                    '''
+                    The query defines the complete set of work items, including those which are not referenced yet.
+                    So the tracing report shows the missing coverage. Equivalent to `import_query` of
+                    lobster-codebeamer.
+                    '''
+            }
+
+            SwReq sw_req_select_baseline {
+                description =
+                    '''
+                    The user shall be able to select the work items by the query from a Polarion baseline instead of
+                    the current state.
+                    '''
+                verification_criteria =
+                    '''
+                    A work item changed after the baseline is read with its content at the time of the baseline.
+                    '''
+                valid_status = AbstractRequirements.VALID_STATUS.valid
+                note =
+                    '''
+                    A tracing report of a release shall show the released state of the work items, which may have
+                    changed since.
+                    '''
+            }
+
+            SwReq sw_req_select_references {
+                description =
+                    '''
+                    The user shall be able to select the work items by the references of an existing LOBSTER common
+                    interchange format file.
+                    '''
+                verification_criteria =
+                    '''
+                    Exactly the work items referenced in the given file are selected.
+                    '''
+                valid_status = AbstractRequirements.VALID_STATUS.rejected
+                note =
+                    '''
+                    Equivalent to `import_tagged` of lobster-codebeamer.
+
+                    Rejected in the review of the tool concept: Only referenced work items are selected, therefore the
+                    tracing report can't show the missing coverage. See `sw_req_select_query`.
+                    '''
+            }
+        }
+
+        section "Mapping to LOBSTER Items" {
+
+            SwReq sw_req_item_id {
+                description =
+                    '''
+                    The software shall identify each work item in the output file by its Polarion project id and work item
+                    id in the format `<project id>:<work item id>`.
+                    '''
+                verification_criteria =
+                    '''
+                    A reference `<project id>:<work item id>` of another LOBSTER item is resolved by `lobster-report`
+                    to the output work item.
+                    '''
+                valid_status = AbstractRequirements.VALID_STATUS.valid
+                note =
+                    '''
+                    Work item ids are only unique within a Polarion project. The lower level items reference the work
+                    items in the same format, so `lobster-report` can resolve the references.
+                    '''
+            }
+
+            SwReq sw_req_item_content {
+                description =
+                    '''
+                    The software shall provide the content of each work item (at least title and description), so that it
+                    is understandable in the tracing report.
+                    '''
+                verification_criteria =
+                    '''
+                    The tracing report shows title and description of each work item as readable text.
+                    '''
+                valid_status = AbstractRequirements.VALID_STATUS.valid
+                note =
+                    '''
+                    Reviewing the traces shall be possible without opening Polarion.
+
+                    Open issue: Shall the user be able to configure further work item fields (incl. custom fields)?
+                    '''
+            }
+
+            SwReq sw_req_item_kind {
+                description =
+                    '''
+                    The user shall be able to select, whether the work items are output as LOBSTER requirements,
+                    implementations or activities.
+                    '''
+                verification_criteria =
+                    '''
+                    The output file contains the work items as the selected kind of LOBSTER item.
+                    '''
+                valid_status = AbstractRequirements.VALID_STATUS.valid
+                note =
+                    '''
+                    Polarion does not only contain requirements, but e.g. also test cases, which are activities in
+                    LOBSTER. Equivalent to `schema` of lobster-codebeamer.
+                    '''
+            }
+
+            SwReq sw_req_item_references {
+                description =
+                    '''
+                    The software shall output the links between work items as LOBSTER references. The user shall be able
+                    to select the link roles.
+                    '''
+                verification_criteria =
+                    '''
+                    Links with the selected roles are shown as traces in the tracing report, links with other roles are
+                    not. A link to a work item of another project references it including its project id, see
+                    `sw_req_item_id`.
+                    '''
+                valid_status = AbstractRequirements.VALID_STATUS.valid
+                note =
+                    '''
+                    Traces between work items are managed in Polarion by links, e.g. a system requirement `refines` a
+                    stakeholder requirement. They shall appear in the tracing report. Equivalent to `refs` of
+                    lobster-codebeamer.
+                    '''
+            }
+        }
+
+        section "Configuration" {
+
+            SwReq sw_req_config_file {
+                description =
+                    '''
+                    The software shall read all settings from a configuration file in JSON format. The path of the
+                    configuration file shall be given as command line argument.
+                    '''
+                verification_criteria =
+                    '''
+                    All settings (Polarion server, credentials, project, query, baseline, mapping to the LOBSTER items)
+                    are given in the configuration file.
+                    '''
+                valid_status = AbstractRequirements.VALID_STATUS.valid
+                note =
+                    '''
+                    The import shall be repeatable with identical settings. lobster-codebeamer uses a configuration
+                    file as well.
+                    '''
+            }
+
+            SwReq sw_req_credentials {
+                description =
+                    '''
+                    The software shall log in to Polarion with user and password from the configuration file. The
+                    software shall be able to process a given personal access token instead of user and password. If both are
+                    given, the token shall be used.
+                    '''
+                verification_criteria =
+                    '''
+                    The software accesses Polarion with the user and password given in the configuration file, as well as
+                    with a personal access token given in the configuration file. If both are given, the token is
+                    used.
+                    '''
+                valid_status = AbstractRequirements.VALID_STATUS.valid
+                note =
+                    '''
+                    One source for all settings, which works the same way on Windows, Linux and in build pipelines.
+                    The configuration file containing the credentials shall not be put under version control; it can
+                    be located outside of the repository.
+                    '''
+            }
+
+            SwReq sw_req_credential_protection {
+                description =
+                    '''
+                    The software shall never output the password or the token.
+                    '''
+                verification_criteria =
+                    '''
+                    Neither the password nor the token appears on the console or in the output file, also not in error
+                    cases.
+                    '''
+                valid_status = AbstractRequirements.VALID_STATUS.valid
+                note =
+                    '''
+                    Console outputs and logs of build pipelines are accessible to many persons and are archived.
+                    '''
+            }
+        }
+
+        section "Reliability of the Result" {
+
+            SwReq sw_req_completeness {
+                description =
+                    '''
+                    The software shall output all selected work items or fail, see `sw_req_failure`.
+                    '''
+                verification_criteria =
+                    '''
+                    The number of output work items is equal to the number of selected work items in Polarion, also for
+                    a large number of work items.
+                    '''
+                valid_status = AbstractRequirements.VALID_STATUS.valid
+                note =
+                    '''
+                    A missing work item would be missing in the tracing report and could hide missing coverage.
+                    '''
+            }
+
+            SwReq sw_req_empty_selection {
+                description =
+                    '''
+                    The software shall fail if no work item is selected.
+                    '''
+                verification_criteria =
+                    '''
+                    A query without matching work items leads to a failure, see `sw_req_failure`.
+                    '''
+                valid_status = AbstractRequirements.VALID_STATUS.valid
+                note =
+                    '''
+                    An empty selection is most likely caused by a wrong configuration, e.g. a typo in the query.
+                    '''
+            }
+
+            SwReq sw_req_failure {
+                description =
+                    '''
+                    On any failure The software shall report the cause, terminate with a failure exit code and leave no
+                    output file.
+                    '''
+                verification_criteria =
+                    '''
+                    For each failure (e.g. server not reachable, login failed, invalid configuration, unexpected
+                    internal error) a message names the cause, the exit code signals the failure and no output file
+                    exists afterwards.
+                    '''
+                valid_status = AbstractRequirements.VALID_STATUS.valid
+                note =
+                    '''
+                    The user must be able to fix the cause. An incomplete output file would lead to a wrong tracing
+                    report without being noticed.
+                    '''
+            }
+        }
+    }
+
+    section "Software Constraints" {
+
+        SwConstraint sw_constraint_python {
+            description =
+                '''
+                The software shall be implemented in Python and support Python 3.10 and newer.
+                '''
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+
+        SwConstraint sw_constraint_os {
+            description =
+                '''
+                The software shall run on Windows and Linux.
+                '''
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+            note =
+                '''
+                Build pipelines typically run on Linux, developers work on Windows.
+                '''
+        }
+
+        SwConstraint sw_constraint_polarion_soap {
+            description =
+                '''
+                The software shall access Polarion via the Polarion SOAP API.
+                '''
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+            note =
+                '''
+                Open issue: Which Polarion versions shall be supported?
+                '''
+        }
+
+        SwConstraint sw_constraint_lobster {
+            description =
+                '''
+                The output file shall be compatible with `bmw-lobster` 1.0.
+                '''
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+
+        SwConstraint sw_constraint_like_lobster_codebeamer {
+            description =
+                '''
+                The concept of The software shall be similar to
+                [lobster-codebeamer](https://github.com/bmw-software-engineering/lobster/tree/main/packages/lobster-tool-codebeamer).
+                '''
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+            note =
+                '''
+                Users familiar with LOBSTER shall find a known concept.
+
+                Deviations decided in the review of the tool concept: No selection by references, see
+                `sw_req_select_references`. Credentials only in the configuration file, no `.netrc` file.
+                '''
+        }
+
+        SwConstraint sw_constraint_like_lobster_doxygen {
+            description =
+                '''
+                Repository structure, code and development tooling shall be similar to
+                [lobster-doxygen](https://github.com/NewTec-GmbH/lobster-doxygen); the requirements documentation
+                similar to [trlc-doc](https://github.com/nhjschulz/trlc-doc).
+                '''
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+            note =
+                '''
+                Uniform NewTec LOBSTER extensions ease the maintenance.
+                '''
+        }
+
+        SwConstraint sw_constraint_coding_guideline {
+            description =
+                '''
+                The source code shall follow the NewTec Coding Guidelines for Python
+                ([coding-guidelines/README.md](../../coding-guidelines/README.md)).
+                '''
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+    }
+}
