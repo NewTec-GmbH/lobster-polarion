@@ -9,11 +9,10 @@ The tool is developed strictly according to the V-model and every work result is
 - **Never skip ahead.** Only produce the artefacts of the current phase. Do not write architecture, code or tests before the
   requirements they are based on exist and were reviewed. Ask if unsure which phase is active (see the GitHub issues).
 - Left side: SW requirements → SW architecture → implementation. There are no stakeholder requirements in this
-  project; the structure follows [trlc-doc](https://github.com/nhjschulz/trlc-doc).
+  project; the structure follows [lobster-doxygen](https://github.com/NewTec-GmbH/lobster-doxygen).
   Right side: SW tests (verify SW requirements).
 - One PR per feature; the PR contains the artefacts of the feature in the order of the V-model.
 - Open questions are recorded in the `note` attribute with the prefix `Open issue:` and must be resolved in the review.
-  Rejected requirements are kept with `valid_status = AbstractRequirements.VALID_STATUS.rejected`.
 
 ### Traceability
 

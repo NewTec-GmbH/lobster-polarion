@@ -11,7 +11,10 @@ section "lobster-polarion" {
             in the LOBSTER common interchange format.
 
             [LOBSTER](https://github.com/bmw-software-engineering/lobster) creates tracing reports, but can't read
-            Polarion work items. lobster-polarion closes this gap, like lobster-codebeamer does for Codebeamer.
+            Polarion work items. lobster-polarion closes this gap, like
+            [lobster-codebeamer](https://github.com/bmw-software-engineering/lobster/blob/main/packages/lobster-tool-codebeamer)
+            does for Codebeamer. Where applicable, lobster-polarion follows the concept of lobster-codebeamer
+            (configuration file, selection by query, references from links, selectable LOBSTER item kind).
             '''
     }
 
@@ -24,54 +27,19 @@ section "lobster-polarion" {
 
         section "General" {
 
-            SwReq sw_req_read_work_items {
-                description =
-                    '''
-                    The software shall read the selected work items from Polarion.
-                    '''
-                verification_criteria =
-                    '''
-                    The software reads exactly the work items of the selection, see `sw_req_select_query`.
-                    '''
-                valid_status = AbstractRequirements.VALID_STATUS.valid
-                note =
-                    '''
-                    Polarion is the source of the higher level work items (e.g. stakeholder requirements).
-                    '''
-            }
-
-            SwReq sw_req_output_lobster {
-                description =
-                    '''
-                    The software shall output the read work items as a file in the LOBSTER common interchange format.
-                    '''
-                verification_criteria =
-                    '''
-                    `lobster-report` accepts the file without errors and shows the work items in the tracing report.
-                    '''
-                valid_status = AbstractRequirements.VALID_STATUS.valid
-                note =
-                    '''
-                    The work items shall appear in a LOBSTER tracing report together with the lower level items (e.g.
-                    TRLC records, source code) which reference them.
-                    '''
-            }
-
             SwReq sw_req_cli {
                 description =
                     '''
-                    The software shall be a command line tool, which runs without user interaction.
+                    The software shall be a command line tool, which runs without user interaction. In case of an error,
+                    the software shall report the cause and create no output file.
                     '''
                 verification_criteria =
                     '''
-                    The software runs in a build pipeline without user interaction and signals success or failure by its
-                    exit code.
+                    The software is able to run using scripts without user interaction and signals success or failure
+                    by its exit code. For each error (e.g. server not reachable, login failed, invalid configuration)
+                    a message names the cause and no output file exists afterwards.
                     '''
                 valid_status = AbstractRequirements.VALID_STATUS.valid
-                note =
-                    '''
-                    The LOBSTER tools are command line tools and typically run in build pipelines.
-                    '''
             }
 
             SwReq sw_req_help {
@@ -85,10 +53,6 @@ section "lobster-polarion" {
                     The help page shows all command line arguments with a short description.
                     '''
                 valid_status = AbstractRequirements.VALID_STATUS.valid
-                note =
-                    '''
-                    The user shall be able to use the tool without further documentation.
-                    '''
             }
 
             SwReq sw_req_version {
@@ -101,10 +65,30 @@ section "lobster-polarion" {
                     The shown version is equal to the released version of the tool.
                     '''
                 valid_status = AbstractRequirements.VALID_STATUS.valid
-                note =
+            }
+
+            SwReq sw_req_read_work_items {
+                description =
                     '''
-                    The used tool version must be identifiable, e.g. for a tool qualification.
+                    The software shall read the selected work items from Polarion.
                     '''
+                verification_criteria =
+                    '''
+                    The software reads exactly the work items of the selection, see `sw_req_select_query`.
+                    '''
+                valid_status = AbstractRequirements.VALID_STATUS.valid
+            }
+
+            SwReq sw_req_output_lobster {
+                description =
+                    '''
+                    The software shall output the read work items as a file in the LOBSTER common interchange format.
+                    '''
+                verification_criteria =
+                    '''
+                    `lobster-report` accepts the file without errors and shows the work items in the tracing report.
+                    '''
+                valid_status = AbstractRequirements.VALID_STATUS.valid
             }
         }
 
@@ -139,31 +123,6 @@ section "lobster-polarion" {
                     A work item changed after the baseline is read with its content at the time of the baseline.
                     '''
                 valid_status = AbstractRequirements.VALID_STATUS.valid
-                note =
-                    '''
-                    A tracing report of a release shall show the released state of the work items, which may have
-                    changed since.
-                    '''
-            }
-
-            SwReq sw_req_select_references {
-                description =
-                    '''
-                    The user shall be able to select the work items by the references of an existing LOBSTER common
-                    interchange format file.
-                    '''
-                verification_criteria =
-                    '''
-                    Exactly the work items referenced in the given file are selected.
-                    '''
-                valid_status = AbstractRequirements.VALID_STATUS.rejected
-                note =
-                    '''
-                    Equivalent to `import_tagged` of lobster-codebeamer.
-
-                    Rejected in the review of the tool concept: Only referenced work items are selected, therefore the
-                    tracing report can't show the missing coverage. See `sw_req_select_query`.
-                    '''
             }
         }
 
@@ -191,20 +150,15 @@ section "lobster-polarion" {
             SwReq sw_req_item_content {
                 description =
                     '''
-                    The software shall provide the content of each work item (at least title and description), so that it
-                    is understandable in the tracing report.
+                    The software shall output the title, the description and the work item fields selected by the user
+                    (incl. custom fields) for each work item.
                     '''
                 verification_criteria =
                     '''
-                    The tracing report shows title and description of each work item as readable text.
+                    The output file contains title, description and the selected fields of each work item; fields which
+                    are not selected are not contained.
                     '''
                 valid_status = AbstractRequirements.VALID_STATUS.valid
-                note =
-                    '''
-                    Reviewing the traces shall be possible without opening Polarion.
-
-                    Open issue: Shall the user be able to configure further work item fields (incl. custom fields)?
-                    '''
             }
 
             SwReq sw_req_item_kind {
@@ -238,12 +192,6 @@ section "lobster-polarion" {
                     `sw_req_item_id`.
                     '''
                 valid_status = AbstractRequirements.VALID_STATUS.valid
-                note =
-                    '''
-                    Traces between work items are managed in Polarion by links, e.g. a system requirement `refines` a
-                    stakeholder requirement. They shall appear in the tracing report. Equivalent to `refs` of
-                    lobster-codebeamer.
-                    '''
             }
         }
 
@@ -261,11 +209,6 @@ section "lobster-polarion" {
                     are given in the configuration file.
                     '''
                 valid_status = AbstractRequirements.VALID_STATUS.valid
-                note =
-                    '''
-                    The import shall be repeatable with identical settings. lobster-codebeamer uses a configuration
-                    file as well.
-                    '''
             }
 
             SwReq sw_req_credentials {
@@ -284,9 +227,8 @@ section "lobster-polarion" {
                 valid_status = AbstractRequirements.VALID_STATUS.valid
                 note =
                     '''
-                    One source for all settings, which works the same way on Windows, Linux and in build pipelines.
-                    The configuration file containing the credentials shall not be put under version control; it can
-                    be located outside of the repository.
+                    Other authentication methods that don't require insecure password storage will be considered at a
+                    later project stage.
                     '''
             }
 
@@ -313,12 +255,14 @@ section "lobster-polarion" {
             SwReq sw_req_completeness {
                 description =
                     '''
-                    The software shall output all selected work items or fail, see `sw_req_failure`.
+                    The software shall output all selected work items. If not all selected work items can be read, the
+                    software shall report the cause, terminate with a failure exit code and create no output file.
                     '''
                 verification_criteria =
                     '''
                     The number of output work items is equal to the number of selected work items in Polarion, also for
-                    a large number of work items.
+                    a large number of work items. If reading a work item fails, an error message names the cause, the
+                    exit code signals the failure and no output file exists.
                     '''
                 valid_status = AbstractRequirements.VALID_STATUS.valid
                 note =
@@ -330,36 +274,18 @@ section "lobster-polarion" {
             SwReq sw_req_empty_selection {
                 description =
                     '''
-                    The software shall fail if no work item is selected.
+                    If no work item is selected, the software shall report this, terminate with a failure exit code and
+                    create no output file.
                     '''
                 verification_criteria =
                     '''
-                    A query without matching work items leads to a failure, see `sw_req_failure`.
+                    A query without matching work items leads to an error message, a failure exit code and no output
+                    file.
                     '''
                 valid_status = AbstractRequirements.VALID_STATUS.valid
                 note =
                     '''
                     An empty selection is most likely caused by a wrong configuration, e.g. a typo in the query.
-                    '''
-            }
-
-            SwReq sw_req_failure {
-                description =
-                    '''
-                    On any failure The software shall report the cause, terminate with a failure exit code and leave no
-                    output file.
-                    '''
-                verification_criteria =
-                    '''
-                    For each failure (e.g. server not reachable, login failed, invalid configuration, unexpected
-                    internal error) a message names the cause, the exit code signals the failure and no output file
-                    exists afterwards.
-                    '''
-                valid_status = AbstractRequirements.VALID_STATUS.valid
-                note =
-                    '''
-                    The user must be able to fix the cause. An incomplete output file would lead to a wrong tracing
-                    report without being noticed.
                     '''
             }
         }
@@ -381,22 +307,15 @@ section "lobster-polarion" {
                 The software shall run on Windows and Linux.
                 '''
             valid_status = AbstractRequirements.VALID_STATUS.valid
-            note =
-                '''
-                Build pipelines typically run on Linux, developers work on Windows.
-                '''
         }
 
         SwConstraint sw_constraint_polarion_soap {
             description =
                 '''
-                The software shall access Polarion via the Polarion SOAP API.
+                The software shall access Polarion via the Polarion SOAP API (Web Services, see
+                [Polarion SDK Documentation](https://testdrive.polarion.com/polarion/sdk/doc/sdk.pdf)).
                 '''
             valid_status = AbstractRequirements.VALID_STATUS.valid
-            note =
-                '''
-                Open issue: Which Polarion versions shall be supported?
-                '''
         }
 
         SwConstraint sw_constraint_lobster {
@@ -407,28 +326,11 @@ section "lobster-polarion" {
             valid_status = AbstractRequirements.VALID_STATUS.valid
         }
 
-        SwConstraint sw_constraint_like_lobster_codebeamer {
-            description =
-                '''
-                The concept of The software shall be similar to
-                [lobster-codebeamer](https://github.com/bmw-software-engineering/lobster/tree/main/packages/lobster-tool-codebeamer).
-                '''
-            valid_status = AbstractRequirements.VALID_STATUS.valid
-            note =
-                '''
-                Users familiar with LOBSTER shall find a known concept.
-
-                Deviations decided in the review of the tool concept: No selection by references, see
-                `sw_req_select_references`. Credentials only in the configuration file, no `.netrc` file.
-                '''
-        }
-
         SwConstraint sw_constraint_like_lobster_doxygen {
             description =
                 '''
-                Repository structure, code and development tooling shall be similar to
-                [lobster-doxygen](https://github.com/NewTec-GmbH/lobster-doxygen); the requirements documentation
-                similar to [trlc-doc](https://github.com/nhjschulz/trlc-doc).
+                Repository structure, code, development tooling and documentation shall follow established methods
+                from related tools like [lobster-doxygen](https://github.com/NewTec-GmbH/lobster-doxygen).
                 '''
             valid_status = AbstractRequirements.VALID_STATUS.valid
             note =
