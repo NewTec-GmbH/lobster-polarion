@@ -55,6 +55,12 @@ located in the `trlc` folder.
 
 The tool concept is described in the [documentation](./doc/README.md) subpage.
 
+A complete project documentation site can be build using
+
+```bash
+trlcdoc clean all show
+```
+
 ## Used Libraries
 
 Used 3rd party libraries which are not part of the standard Python package:
