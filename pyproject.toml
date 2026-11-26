@@ -10,6 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 authors = [
     { name = "Tobias Haeckel", email = "tobias.haeckel@newtec.de" },
+    { name = "Norbert Schulz", email = "norbert.schulz@newtec.de" },
 ]
 license = "GPL-3.0-or-later"
 classifiers = [
@@ -40,7 +41,7 @@ dev = [
     "sphinxcontrib-plantuml>=0.30",
     "sphinx-autoapi>=0.5.0",
     "m2r>=0.3.1",
-    "pyTRLCConverter==3.0.*",
+    "trlcdoc >= 0.6.0"
 ]
 
 [project.urls]

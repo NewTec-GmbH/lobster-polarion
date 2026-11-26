@@ -1,0 +1,55 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nhjschulz/trlc-doc/develop/trlcdoc/schema/trlcdoc.schema.json
+#
+# trlcdoc configuration of the lobster-polarion documentation: requirements,
+# architecture, detailed design, tests, test results, tracing report, coverage
+# report and the HTML site.
+#
+#   trlcdoc                                # all steps, site in build/trlcdoc/html
+#   trlcdoc --online                       # tracing report linked to GitHub
+#
+# Exit codes: 0 success, 1 content findings (failed tests, missing trace links), 2 build error.
+# See https://github.com/nhjschulz/trlc-doc/blob/develop/configuration.md for the reference.
+project:
+  name: lobster-polarion
+  author: NewTec GmbH
+  copyright: 2026 - 2026, NewTec GmbH
+  repository: https://github.com/NewTec-GmbH/lobster-polarion
+  logo: doc/images/NewTec_Logo.png
+  favicon: doc/images/favicon.ico
+
+paths:
+  trlc_model: trlc/model
+  output: build/trlcdoc
+
+plantuml:
+  version: "1.2026.1"
+
+documents:
+  - id:  readme_about
+    title: About lobster-polarion
+    type: markdown
+    source: README.md
+
+  - id: sw_detail_design
+    type: rst
+    source: doc/sphinx/sw_detail_design.rst
+
+  - id: license_include
+    title: License information
+    type: text
+    source: LICENSE
+
+html:
+  theme: sphinx_rtd_theme
+  extensions:
+    - sphinx_rtd_theme
+    - autoapi.extension
+    - sphinx.ext.napoleon
+    - sphinx.ext.viewcode
+    - sphinx.ext.inheritance_diagram
+    - sphinx.ext.autodoc
+    - sphinx_favicon
+    - sphinx.ext.autosummary
+  conf: doc/sphinx/sphinx_conf.py
+  index: doc/sphinx/index.rst
+  page_header: doc/sphinx/page_header.rst
