@@ -19,6 +19,8 @@ This allows to use Polarion work items in a LOBSTER tracing report. The concept 
 [lobster-codebeamer](https://github.com/bmw-software-engineering/lobster/tree/main/packages/lobster-tool-codebeamer),
 which closes the same gap for Codebeamer.
 
+![Overview](./trlc/swe-req/img/overview.svg)
+
 > [!NOTE]
 > lobster-polarion is not a standalone solution, but a component extending the
 > [BMW LOBSTER tooling](https://github.com/bmw-software-engineering/lobster). Understanding of the LOBSTER tool purpose and usage
