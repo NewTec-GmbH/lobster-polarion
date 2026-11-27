@@ -1,0 +1,65 @@
+@startuml dynamic_view
+
+' Setting ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+skinparam sequenceMessageAlign center
+
+' Participants '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+actor "User" as user
+participant "lobster-polarion" as tool #lightgreen
+participant "Configuration\n(*.json)" as config #lightyellow
+participant "Polarion SOAP API" as polarion #lightgrey
+participant "LOBSTER common interchange\nformat file (*.lobster)" as output #lightyellow
+
+' Flows ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+user -> tool ++ : call with program arguments\n(configuration file, output file)
+
+    == Configuration ==
+
+    tool -> config ++ : read configuration
+    tool <-- config -- : server, credentials, project, query,\nbaseline revision, fields, link roles, LOBSTER item kind
+
+    tool -> tool : resolve environment variables\nand validate configuration
+
+    == Polarion access ==
+
+    tool -> polarion ++ : log in (token or user and password)
+    tool <-- polarion -- : session
+
+    tool -> polarion ++ : count work items\n(project and query)
+    tool <-- polarion -- : number of work items
+
+    alt baseline configured
+        tool -> polarion ++ : query work items in baseline\n(project and query, baseline revision, fields)
+        tool <-- polarion -- : all work items with fields and links
+    else current state
+        tool -> polarion ++ : query work items\n(project and query, fields)
+        tool <-- polarion -- : all work items with fields and links
+    end
+
+    tool -> tool : check completeness\n(number of work items = count)
+
+    tool -> polarion ++ : log out
+    tool <-- polarion --
+
+    == Conversion ==
+
+    break Error handling
+        user <-- tool : error, failure exit code
+    end
+
+    loop every work item
+        tool -> tool : create LOBSTER item of the selected kind\n(tag <project id>:<work item id>, title, description,\nselected fields, refs from links with selected roles)
+    end
+
+    tool -> output ++ : write LOBSTER items into output file
+    tool <-- output --
+
+    user <-- tool : success exit code
+
+
+deactivate tool
+
+@enduml
