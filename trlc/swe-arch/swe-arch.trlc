@@ -1,0 +1,99 @@
+package SwArchitecture
+import AbstractRequirements
+import SwRequirements
+import Generic
+
+section "lobster-polarion" {
+
+    Generic.Info sw_arch_info_about_sw_arch {
+        description =
+            '''
+            This file contains the software architecture of lobster-polarion. It describes how the software reads the
+            selected work items via the Polarion SOAP API and writes them as LOBSTER items, and links each part of the
+            architecture to the software requirements it satisfies.
+
+            The tool concept (use cases, id mapping, context diagram) is described in the
+            [tool concept](../../doc/README.md).
+            '''
+    }
+
+    section "Dynamic View" {
+
+        Generic.Info sw_arch_info_dynamic_view {
+            description =
+                '''
+                The following diagram shows the interaction of lobster-polarion with its environment during one run.
+                The run is divided into configuration, Polarion access and conversion.
+                '''
+        }
+
+        Generic.PlantUML sw_arch_dynamic_view_diagram {
+            caption = "Dynamic View"
+            file_path = "img/dynamic_view.puml"
+        }
+
+        SwArchSpec sw_arch_configuration {
+            description =
+                '''
+                The software reads the configuration file given as program argument. The configuration contains the
+                Polarion server, the credentials, the project, the query, the optional baseline revision, the work item
+                fields, the link roles and the LOBSTER item kind. The software resolves environment variables and
+                validates the configuration before it accesses Polarion.
+                '''
+            satisfies = [SwRequirements.sw_req_config_file, SwRequirements.sw_req_credentials]
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+
+        SwArchSpec sw_arch_polarion_access {
+            description =
+                '''
+                The software logs in to Polarion via the SOAP API with the token or with user and password. It queries
+                the work items of the configured project matching the query, from the configured baseline revision or
+                from the current state, including the selected fields and the links. The query returns all work items
+                in a single response (no paging). Afterwards the software logs out.
+                '''
+            satisfies = [SwRequirements.sw_req_read_work_items, SwRequirements.sw_req_select_query,
+                         SwRequirements.sw_req_select_baseline, SwRequirements.sw_req_credentials,
+                         SwRequirements.sw_constraint_polarion_soap]
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+
+        SwArchSpec sw_arch_completeness_check {
+            description =
+                '''
+                Before the query the software requests the number of work items matching the query. After the query it
+                compares this number with the number of returned work items. If they differ, the software reports the
+                cause, terminates with a failure exit code and creates no output file.
+                '''
+            satisfies = [SwRequirements.sw_req_completeness]
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+            note =
+                '''
+                Open issue: The count request has no baseline revision parameter. Check whether the completeness check
+                works for queries in a baseline.
+                '''
+        }
+
+        SwArchSpec sw_arch_conversion {
+            description =
+                '''
+                The software creates one LOBSTER item of the selected kind for every work item. The tag is
+                `<project id>:<work item id>`. The item contains the title, the description and the selected fields.
+                Links with the selected roles become references.
+                '''
+            satisfies = [SwRequirements.sw_req_item_id, SwRequirements.sw_req_item_content,
+                         SwRequirements.sw_req_item_kind, SwRequirements.sw_req_item_references]
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+
+        SwArchSpec sw_arch_output {
+            description =
+                '''
+                The software writes all LOBSTER items into the output file given as program argument and signals the
+                result by its exit code.
+                '''
+            satisfies = [SwRequirements.sw_req_output_lobster, SwRequirements.sw_req_cli]
+            valid_status = AbstractRequirements.VALID_STATUS.valid
+        }
+    }
+}
