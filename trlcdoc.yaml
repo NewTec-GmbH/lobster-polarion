@@ -30,6 +30,29 @@ documents:
     type: markdown
     source: README.md
 
+  - id: sw_requirements
+    title: Software Requirements
+    type: trlc
+    source: trlc/swe-req
+    pytrlcconverter:
+      converter:
+        rst: builtin:req2rst.py
+        markdown: builtin:req2markdown.py
+      translation: builtin:translation.json
+      render_cfg: builtin:renderCfg.json
+
+  - id: sw_architecture
+    title: Software Architecture
+    type: trlc
+    source: trlc/swe-arch
+    include: [sw_requirements]
+    pytrlcconverter:
+      converter:
+        rst: builtin:req2rst.py
+        markdown: builtin:req2markdown.py
+      translation: builtin:translation.json
+      render_cfg: builtin:renderCfg.json
+
   - id: sw_detail_design
     type: rst
     source: doc/sphinx/sw_detail_design.rst

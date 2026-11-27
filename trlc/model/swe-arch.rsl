@@ -1,0 +1,8 @@
+package SwArchitecture
+import AbstractRequirements
+
+// Software Architecture Specification
+type SwArchSpec extends AbstractRequirements.Requirement {
+    // SW requirements or SW constraints satisfied by this architecture specification.
+    satisfies   AbstractRequirements.Requirement [1 .. *]
+}
